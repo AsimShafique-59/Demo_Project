@@ -69,18 +69,6 @@ async function api(path, opts = {}) {
 }
 
 // --- Login ---
-async function loadUsers() {
-  const users = await api('/api/users');
-  const list = document.getElementById('user-list');
-  list.innerHTML = '';
-  users.forEach(u => {
-    const btn = document.createElement('button');
-    btn.innerHTML = `${avatarHTML(u.username)}<span>Sign in as ${escapeHtml(u.username)}</span>`;
-    btn.onclick = () => login(u);
-    list.appendChild(btn);
-  });
-}
-
 function login(user) {
   state.user = user;
   localStorage.setItem('docly_user', JSON.stringify(user));
@@ -93,7 +81,8 @@ function logout() {
   localStorage.removeItem('docly_user');
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app-screen').style.display = 'none';
-  loadUsers();
+  document.getElementById('signup-username').value = '';
+  document.getElementById('signup-password').value = '';
 }
 
 function showApp() {

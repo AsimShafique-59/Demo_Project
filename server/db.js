@@ -1,5 +1,6 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const { hashPassword } = require('./auth');
 
 const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'data.sqlite');
 const db = new Database(dbPath);
@@ -31,8 +32,10 @@ db.exec(`
   );
 `);
 
+// Seeded demo accounts, all sharing the same demo password (see README for credentials).
+const DEMO_PASSWORD = 'password123';
 const seedUsers = ['alice', 'bob', 'carol'];
-const insertUser = db.prepare('INSERT OR IGNORE INTO users (username) VALUES (?)');
-for (const u of seedUsers) insertUser.run(u);
+const insertUser = db.prepare('INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)');
+for (const u of seedUsers) insertUser.run(u, hashPassword(DEMO_PASSWORD));
 
 module.exports = db;

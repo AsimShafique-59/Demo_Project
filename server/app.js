@@ -55,17 +55,13 @@ app.post('/api/users', (req, res) => {
   res.status(201).json({ id: result.lastInsertRowid, username });
 });
 
-// log in to an existing password-protected account
+// log in to an existing account (seeded demo accounts or ones created via sign-up)
 app.post('/api/login', (req, res) => {
   const username = (req.body.username || '').trim().toLowerCase();
   const password = req.body.password || '';
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  if (!user) return res.status(404).json({ error: `No account named "${username}"` });
-  if (!user.password_hash) {
-    return res.status(400).json({ error: 'This is a demo account — use the one-click sign-in above' });
-  }
-  if (!verifyPassword(password, user.password_hash)) {
-    return res.status(401).json({ error: 'Incorrect password' });
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Incorrect username or password' });
   }
   res.json({ id: user.id, username: user.username });
 });

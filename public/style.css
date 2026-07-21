@@ -54,24 +54,7 @@ body {
 .login-card p { color: var(--text-muted); margin: 0 0 20px; font-size: 14px; line-height: 1.5; }
 .fine-print { color: var(--text-faint); font-size: 12px; margin: 20px 0 0; }
 
-.user-list { display: flex; flex-direction: column; gap: 8px; }
-.user-list button {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border);
-  background: var(--surface); cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text);
-  transition: border-color .15s, background .15s, transform .1s;
-  text-align: left;
-}
-.user-list button:hover { background: var(--primary-soft); border-color: var(--primary); }
-.user-list button:active { transform: scale(.98); }
-
-.login-divider {
-  display: flex; align-items: center; gap: 10px; color: var(--text-faint);
-  font-size: 12px; margin: 22px 0 16px;
-}
-.login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-.signup-form { display: flex; flex-direction: column; gap: 10px; }
+.signup-form { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 .signup-form input {
   padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-strong);
   font-size: 14px; outline: none; width: 100%;
@@ -84,13 +67,23 @@ body {
 }
 .link-btn:hover { text-decoration: underline; }
 
+.demo-creds {
+  margin-top: 22px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-md); font-size: 12.5px; color: var(--text-muted); text-align: left;
+}
+.demo-creds strong { color: var(--text); font-size: 12.5px; }
+.demo-creds code {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+  padding: 1px 5px; font-size: 12px;
+}
+.demo-creds-names { margin-top: 4px; font-family: ui-monospace, monospace; color: var(--text-faint); }
+
 /* ---------- Avatars ---------- */
 .avatar {
   display: inline-flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; border-radius: 50%; font-size: 11.5px; font-weight: 700;
   color: #fff; flex-shrink: 0; text-transform: uppercase;
 }
-.user-list button .avatar { width: 28px; height: 28px; }
 
 /* ---------- Topbar ---------- */
 .topbar {
