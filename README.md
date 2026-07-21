@@ -16,10 +16,15 @@ This is intentionally **not** Next.js/TypeScript — see [ARCHITECTURE.md](ARCHI
 for why a build-free vanilla stack was chosen for this scope, and what a
 production-grade rewrite would look like.
 
-**Auth**: Mocked and dynamic — sign in as one of the 3 seeded users (alice, bob, carol),
-or type any new username on the login screen to create an account on the fly (`POST /api/users`).
-No passwords. This keeps scope reasonable while still demonstrating real per-user
-access control server-side.
+**Auth**: Hybrid, kept intentionally lightweight —
+- The 3 seeded demo users (alice, bob, carol) sign in with a single click, no password,
+  so reviewers can test sharing instantly.
+- Anyone else can create a real account (username + password, min 6 chars) via the sign-up
+  form, or log back into one they created. Passwords are salted and hashed with `scrypt`
+  server-side (`server/auth.js`) — never stored or returned in plaintext. There are no
+  sessions/cookies/JWTs: the client just holds the returned `{id, username}` and sends
+  `X-User-Id` on each request, which is enough to demonstrate real per-user access control
+  without building out full session infrastructure for a demo.
 
 ## Setup & run (local)
 

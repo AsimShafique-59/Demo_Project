@@ -100,7 +100,7 @@ function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
   document.getElementById('whoami').textContent = state.user.username;
-  document.getElementById('whoami-avatar').outerHTML = avatarHTML(state.user.username);
+  applyAvatar(document.getElementById('whoami-avatar'), state.user.username);
   document.getElementById('editor-pane').style.display = 'none';
   document.getElementById('empty-state').style.display = 'flex';
   refreshDocList();
@@ -375,15 +375,26 @@ document.getElementById('delete-btn').addEventListener('click', async () => {
   if (ok) deleteCurrentDocument();
 });
 
+let authMode = 'signup';
+document.getElementById('toggle-mode-btn').addEventListener('click', () => {
+  authMode = authMode === 'signup' ? 'login' : 'signup';
+  const isLogin = authMode === 'login';
+  document.getElementById('signup-mode-label').textContent = isLogin ? 'log in to your account' : 'or create a new account';
+  document.getElementById('signup-submit-btn').textContent = isLogin ? 'Log in' : 'Create account';
+  document.getElementById('toggle-mode-btn').textContent = isLogin ? "Don't have an account? Sign up" : 'Already have an account? Log in';
+  document.getElementById('signup-error').style.display = 'none';
+});
+
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const input = document.getElementById('signup-username');
+  const username = document.getElementById('signup-username').value.trim();
+  const password = document.getElementById('signup-password').value;
   const errorEl = document.getElementById('signup-error');
   errorEl.style.display = 'none';
-  const username = input.value.trim();
-  if (!username) return;
+  if (!username || !password) return;
   try {
-    const user = await api('/api/users', { method: 'POST', body: JSON.stringify({ username }) });
+    const endpoint = authMode === 'login' ? '/api/login' : '/api/users';
+    const user = await api(endpoint, { method: 'POST', body: JSON.stringify({ username, password }) });
     login(user);
   } catch (e) {
     errorEl.textContent = e.message;

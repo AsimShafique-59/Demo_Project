@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const db = require('./db');
+const { hashPassword, verifyPassword } = require('./auth');
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -37,18 +38,36 @@ app.get('/api/users', (req, res) => {
   res.json(db.prepare('SELECT id, username FROM users').all());
 });
 
-// dynamic "sign up": create a user on the fly, or sign in if the username already exists
+// dynamic sign-up: create a new password-protected account
 app.post('/api/users', (req, res) => {
   const username = (req.body.username || '').trim().toLowerCase();
+  const password = req.body.password || '';
   if (!username) return res.status(400).json({ error: 'Username is required' });
   if (!/^[a-z0-9_-]{2,20}$/.test(username)) {
     return res.status(400).json({ error: 'Username must be 2-20 characters: letters, numbers, - or _' });
   }
-  const existing = db.prepare('SELECT id, username FROM users WHERE username = ?').get(username);
-  if (existing) return res.json(existing);
+  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
-  const result = db.prepare('INSERT INTO users (username) VALUES (?)').run(username);
+  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+  if (existing) return res.status(409).json({ error: 'That username is taken — try logging in instead' });
+
+  const result = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, hashPassword(password));
   res.status(201).json({ id: result.lastInsertRowid, username });
+});
+
+// log in to an existing password-protected account
+app.post('/api/login', (req, res) => {
+  const username = (req.body.username || '').trim().toLowerCase();
+  const password = req.body.password || '';
+  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  if (!user) return res.status(404).json({ error: `No account named "${username}"` });
+  if (!user.password_hash) {
+    return res.status(400).json({ error: 'This is a demo account — use the one-click sign-in above' });
+  }
+  if (!verifyPassword(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Incorrect password' });
+  }
+  res.json({ id: user.id, username: user.username });
 });
 
 app.get('/api/me', currentUser, (req, res) => res.json(req.user));

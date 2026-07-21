@@ -18,13 +18,15 @@
     <p>Sign in as an existing account, or create a new one on the fly. No password needed.</p>
     <div id="user-list" class="user-list"></div>
 
-    <div class="login-divider"><span>or create a new account</span></div>
+    <div class="login-divider"><span id="signup-mode-label">or create a new account</span></div>
 
     <form id="signup-form" class="signup-form">
-      <input id="signup-username" type="text" placeholder="Choose a username" autocomplete="off" maxlength="20" />
-      <button type="submit" class="btn-primary">Create &amp; sign in</button>
+      <input id="signup-username" type="text" placeholder="Username" autocomplete="username" maxlength="20" />
+      <input id="signup-password" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password" />
+      <button type="submit" id="signup-submit-btn" class="btn-primary">Create account</button>
     </form>
     <p id="signup-error" class="field-error" style="display:none"></p>
+    <button type="button" id="toggle-mode-btn" class="link-btn">Already have an account? Log in</button>
 
     <p class="fine-print">Mock authentication for demo purposes only — no passwords are used.</p>
   </div>
