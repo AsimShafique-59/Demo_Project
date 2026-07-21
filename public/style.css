@@ -67,17 +67,6 @@ body {
 }
 .link-btn:hover { text-decoration: underline; }
 
-.demo-creds {
-  margin-top: 22px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--radius-md); font-size: 12.5px; color: var(--text-muted); text-align: left;
-}
-.demo-creds strong { color: var(--text); font-size: 12.5px; }
-.demo-creds code {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-  padding: 1px 5px; font-size: 12px;
-}
-.demo-creds-names { margin-top: 4px; font-family: ui-monospace, monospace; color: var(--text-faint); }
-
 /* ---------- Avatars ---------- */
 .avatar {
   display: inline-flex; align-items: center; justify-content: center;
