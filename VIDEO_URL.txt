@@ -1,0 +1,14 @@
+Walkthrough video (unlisted Loom or YouTube link):
+
+TODO — paste your video URL here after recording.
+
+Suggested flow to record (3-5 min):
+1. Log in as alice / password123
+2. Create a document, apply formatting (bold/italic/underline/heading/list)
+3. Upload a .txt file to create a new document from it
+4. Share a document with bob
+5. Sign out, log in as bob, show it under "Shared with me"
+6. Open Version History on a document, make an edit, show a restore
+7. Click Export, show the downloaded .md file
+8. Refresh the page to show persistence
+9. Briefly mention what was deprioritized (see ARCHITECTURE.md) and how AI was used (see AI_WORKFLOW.md)
