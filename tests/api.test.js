@@ -5,12 +5,18 @@ const path = require('node:path');
 
 const testDbPath = path.join(__dirname, 'test.sqlite');
 if (fs.existsSync(testDbPath)) fs.unlinkSync(testDbPath);
-process.env.DB_PATH = testDbPath;
 process.env.VERSION_SNAPSHOT_INTERVAL_MS = '0'; // snapshot on every edit in tests, no throttling
 
 const request = require('supertest');
-const app = require('../server/app');
-const db = require('../server/db');
+const { createDb } = require('../server/db');
+const { createApp } = require('../server/app');
+
+let app, db;
+
+test.before(async () => {
+  db = await createDb(testDbPath);
+  app = await createApp(db);
+});
 
 function userId(username) {
   return db.prepare('SELECT id FROM users WHERE username = ?').get(username).id;
