@@ -2,12 +2,17 @@
 
 ## Included in this folder
 
-- `server/` — Express backend (auth middleware, document CRUD, sharing, file upload)
-- `public/` — frontend (login screen, editor, sidebar, share modal) — vanilla HTML/CSS/JS
-- `tests/api.test.js` — automated API test suite (`npm test`), 4 passing tests covering
-  auth, ownership, sharing/access control, and validation
-- `README.md` — local setup and run instructions, feature walkthrough, known limitations
-- `ARCHITECTURE.md` — what was prioritized, what was cut, and why
+- `server/` — Express backend: password auth (sign-up/login), document CRUD, sharing
+  (grant/revoke), delete, file upload
+- `public/` — frontend: login/sign-up screen, editor, sidebar with search, share modal,
+  confirm-delete dialog, toast notifications — vanilla HTML/CSS/JS
+- `tests/api.test.js` — automated API test suite (`npm test`), 8 passing tests covering
+  auth (sign-up/login/password verification), ownership, sharing/access control, revoke,
+  delete, and validation
+- `README.md` — stack, local setup and run instructions, feature walkthrough, demo
+  credentials, known limitations
+- `ARCHITECTURE.md` — what was prioritized, what was cut, and why (including the stack
+  choice of vanilla JS/Express over Next.js/TypeScript)
 - `AI_WORKFLOW.md` — AI tool usage note
 - `package.json` — `npm install`, `npm start`, `npm test`
 
@@ -22,30 +27,36 @@ here (a live deploy, a screen recording, uploading to Google Drive/YouTube/Loom)
   web service tier: connect this repo, build command `npm install`, start command
   `npm start`, and add a persistent disk mounted so `data.sqlite` survives restarts.
 - **Walkthrough video (3-5 min)** — not recorded. Suggested flow to record once deployed:
-  sign in as alice → create a doc → apply formatting → upload a `.txt` file → share the
-  doc with bob → switch user to bob → show it under "Shared with me" → refresh to show
-  persistence.
+  log in as `alice` → create a doc → apply formatting → upload a `.txt` file → share the
+  doc with `bob` → sign out → log in as `bob` → show it under "Shared with me" → refresh
+  to show persistence.
 - **Google Drive folder** — packaging/upload not performed in this session.
 
 ## Test accounts
 
-No passwords — pick a seeded user from the login screen:
+Real username + password auth. Three seeded demo accounts exist for reviewers:
 
-- `alice`
-- `bob`
-- `carol`
+| Username | Password |
+|---|---|
+| `alice` | `password123` |
+| `bob` | `password123` |
+| `carol` | `password123` |
 
-Suggested sharing demo: sign in as `alice`, create/edit a document, share it with `bob`,
-then switch user to `bob` to see it appear under "Shared with me".
+You can also sign up your own account from the login screen.
+
+Suggested sharing demo: log in as `alice`, create/edit a document, share it with `bob`,
+then sign out and log in as `bob` to see it appear under "Shared with me".
 
 ## What's working vs. incomplete
 
-**Working end-to-end:** create, rename, rich-text edit (bold/italic/underline/headings/
-lists), autosave, reopen after refresh, upload `.txt`/`.md` into a new document, share a
-document with another seeded user, visible owned-vs-shared distinction, server-side access
-control (verified by automated tests), basic validation (empty title rejected, unsupported
-upload types rejected).
+**Working end-to-end:** sign-up/login with hashed passwords, create, rename, rich-text
+edit (bold/italic/underline/headings/bulleted+numbered lists), autosave, reopen after
+refresh, upload `.txt`/`.md` into a new document, share a document with another user,
+revoke a share, delete an owned document, visible owned-vs-shared distinction, search
+across documents, server-side access control (verified by 8 automated tests), validation
+(empty title, weak password, duplicate username, unsupported upload type all rejected).
 
-**Incomplete / explicitly out of scope:** real authentication, real-time co-editing,
-granular (viewer/editor) permissions, `.docx` import, version history, PDF/Markdown export.
-See ARCHITECTURE.md for the reasoning and what's next.
+**Incomplete / explicitly out of scope:** sessions/cookies (auth is header-based per
+request, no server-side session store), real-time co-editing, granular (viewer/editor)
+permissions, `.docx` import, version history, PDF/Markdown export. See ARCHITECTURE.md
+for the reasoning and what's next.
