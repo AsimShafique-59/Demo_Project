@@ -113,9 +113,19 @@ test('sign-up creates a password-protected account, and login verifies it', asyn
   assert.strictEqual(tooShort.status, 400);
 });
 
-test('seeded demo accounts have no password and reject /api/login', async () => {
-  const res = await request(app).post('/api/login').send({ username: 'alice', password: 'anything' });
-  assert.strictEqual(res.status, 400);
+test('seeded demo accounts log in with the shared demo password, and reject a wrong one', async () => {
+  const wrong = await request(app).post('/api/login').send({ username: 'alice', password: 'anything' });
+  assert.strictEqual(wrong.status, 401);
+
+  const right = await request(app).post('/api/login').send({ username: 'alice', password: 'password123' });
+  assert.strictEqual(right.status, 200);
+  assert.strictEqual(right.body.username, 'alice');
+});
+
+test('login for a nonexistent user returns the same generic error (no user enumeration)', async () => {
+  const res = await request(app).post('/api/login').send({ username: 'nobody', password: 'whatever' });
+  assert.strictEqual(res.status, 401);
+  assert.strictEqual(res.body.error, 'Incorrect username or password');
 });
 
 test('owner can revoke a share, and can delete their document', async () => {

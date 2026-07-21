@@ -364,11 +364,14 @@ document.getElementById('delete-btn').addEventListener('click', async () => {
   if (ok) deleteCurrentDocument();
 });
 
-let authMode = 'signup';
+let authMode = 'login';
 document.getElementById('toggle-mode-btn').addEventListener('click', () => {
-  authMode = authMode === 'signup' ? 'login' : 'signup';
+  authMode = authMode === 'login' ? 'signup' : 'login';
   const isLogin = authMode === 'login';
-  document.getElementById('signup-mode-label').textContent = isLogin ? 'log in to your account' : 'or create a new account';
+  document.getElementById('auth-heading').textContent = isLogin ? 'Log in' : 'Create your account';
+  document.getElementById('auth-subheading').textContent = isLogin
+    ? 'Enter your username and password to continue.'
+    : 'Choose a username and password (min 6 characters).';
   document.getElementById('signup-submit-btn').textContent = isLogin ? 'Log in' : 'Create account';
   document.getElementById('toggle-mode-btn').textContent = isLogin ? "Don't have an account? Sign up" : 'Already have an account? Log in';
   document.getElementById('signup-error').style.display = 'none';
@@ -392,7 +395,6 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 });
 
 initToolbar();
-loadUsers();
 
 const saved = localStorage.getItem('docly_user');
 if (saved) {
