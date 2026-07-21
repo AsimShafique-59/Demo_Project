@@ -5,13 +5,21 @@ upload text files as new documents, and share documents between seeded users.
 
 ## Stack
 
-- **Backend**: Node.js + Express
-- **Database**: SQLite (via `better-sqlite3`), single file `data.sqlite`
-- **Frontend**: Vanilla HTML/CSS/JS (no build step), `contenteditable` + `document.execCommand`
-  for rich text
-- **Auth**: Mocked — pick one of 3 seeded users (alice, bob, carol) from a login screen,
-  no passwords. This keeps scope reasonable while still demonstrating real
-  per-user access control server-side.
+| Layer | Choice | Notes |
+|---|---|---|
+| Backend | Node.js + Express (JavaScript) | REST API, served from `server/` |
+| Database | SQLite via `better-sqlite3` | Single file, `data.sqlite`, zero setup |
+| Frontend | Vanilla HTML/CSS/JS (no framework, no build step) | `contenteditable` + `document.execCommand` for rich text |
+| Testing | Node's built-in `node:test` + `supertest` | Runs against the real Express app |
+
+This is intentionally **not** Next.js/TypeScript — see [ARCHITECTURE.md](ARCHITECTURE.md)
+for why a build-free vanilla stack was chosen for this scope, and what a
+production-grade rewrite would look like.
+
+**Auth**: Mocked and dynamic — sign in as one of the 3 seeded users (alice, bob, carol),
+or type any new username on the login screen to create an account on the fly (`POST /api/users`).
+No passwords. This keeps scope reasonable while still demonstrating real per-user
+access control server-side.
 
 ## Setup & run (local)
 
