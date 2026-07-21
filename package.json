@@ -2,6 +2,9 @@
   "name": "docly",
   "version": "1.0.0",
   "main": "server/index.js",
+  "engines": {
+    "node": "20.x || 22.x || 23.x || 24.x"
+  },
   "directories": {
     "test": "tests"
   },
@@ -14,7 +17,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "better-sqlite3": "^13.0.1",
+    "better-sqlite3": "^12.11.1",
     "express": "^5.2.1",
     "multer": "^2.2.0"
   },

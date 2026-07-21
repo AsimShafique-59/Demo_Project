@@ -424,22 +424,72 @@ function nodeToMarkdown(node) {
   }
 }
 
-function exportCurrentDocument() {
-  if (!state.currentDoc) return;
-  const container = document.createElement('div');
-  container.innerHTML = document.getElementById('editor').innerHTML;
-  const markdown = `# ${state.currentDoc.title}\n\n${htmlToMarkdown(container)}\n`;
+function sanitizeFilename(title) {
+  return title.replace(/[^a-z0-9-_ ]/gi, '').trim() || 'document';
+}
 
-  const blob = new Blob([markdown], { type: 'text/markdown' });
+function downloadBlob(content, mimeType, filename) {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${state.currentDoc.title.replace(/[^a-z0-9-_ ]/gi, '').trim() || 'document'}.md`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+function exportAsMarkdown() {
+  if (!state.currentDoc) return;
+  const container = document.createElement('div');
+  container.innerHTML = document.getElementById('editor').innerHTML;
+  const markdown = `# ${state.currentDoc.title}\n\n${htmlToMarkdown(container)}\n`;
+  downloadBlob(markdown, 'text/markdown', `${sanitizeFilename(state.currentDoc.title)}.md`);
   toast('Exported as Markdown', 'success');
+}
+
+function exportAsText() {
+  if (!state.currentDoc) return;
+  const text = `${state.currentDoc.title}\n\n${document.getElementById('editor').innerText}`;
+  downloadBlob(text, 'text/plain', `${sanitizeFilename(state.currentDoc.title)}.txt`);
+  toast('Exported as text', 'success');
+}
+
+// PDF export via the browser's native print-to-PDF, rather than a server-side
+// renderer (e.g. Puppeteer) — no new dependency, and it wouldn't fit within a
+// free-tier host's RAM/storage limits anyway.
+function exportAsPDF() {
+  if (!state.currentDoc) return;
+  const printWindow = window.open('', '_blank', 'width=850,height=1100');
+  if (!printWindow) {
+    toast('Please allow pop-ups to export as PDF', 'error');
+    return;
+  }
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html><html><head><title>${escapeHtml(state.currentDoc.title)}</title>
+    <style>
+      body { font-family: -apple-system, Arial, sans-serif; padding: 48px; max-width: 800px; margin: 0 auto; line-height: 1.6; color: #1a1d23; }
+      h1 { font-size: 26px; } h2 { font-size: 20px; } h3 { font-size: 17px; }
+      ul, ol { padding-left: 24px; }
+    </style></head><body>
+    <h1>${escapeHtml(state.currentDoc.title)}</h1>
+    ${document.getElementById('editor').innerHTML}
+    </body></html>`);
+  printWindow.document.close();
+  setTimeout(() => {
+    printWindow.focus();
+    printWindow.print();
+  }, 250);
+}
+
+function openExportMenu() {
+  const menu = document.getElementById('export-menu');
+  menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+}
+
+function closeExportMenu() {
+  document.getElementById('export-menu').style.display = 'none';
 }
 
 // --- Wire up ---
