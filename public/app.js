@@ -19,6 +19,10 @@ function avatarHTML(name, size) {
   const style = `background:${avatarColor(name)};${size ? `width:${size}px;height:${size}px;font-size:${size * 0.42}px;` : ''}`;
   return `<span class="avatar" style="${style}">${initials(name)}</span>`;
 }
+function applyAvatar(el, name) {
+  el.style.background = avatarColor(name);
+  el.textContent = initials(name);
+}
 
 function relativeTime(iso) {
   const then = new Date(iso.replace(' ', 'T') + 'Z').getTime();
