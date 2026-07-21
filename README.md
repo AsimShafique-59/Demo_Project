@@ -92,13 +92,19 @@ cut for scope — see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 Ships as a single Node process serving both the API and static frontend, so it deploys
 as-is to any Node host (Render, Railway, Fly.io, a VPS, etc.) with `npm install && npm start`.
-No environment variables are required for local/demo use. `data.sqlite` should live on
-persistent storage (a mounted volume) if deployed somewhere with an ephemeral filesystem —
-set `DB_PATH` to point at that mounted path (defaults to `./data.sqlite` otherwise).
+No environment variables are required.
 
-A `render.yaml` is included for a one-click deploy on [Render](https://render.com): it
-provisions a free web service with a persistent disk mounted for the database, wired via
-`DB_PATH`. Connect this repo in the Render dashboard and it picks up the config automatically.
+A `render.yaml` is included for a one-click **free** deploy on [Render](https://render.com)
+(Blueprint deploy — connect the repo and it picks up the config automatically).
+
+**Free-tier tradeoff, stated plainly**: Render's persistent disks require a paid plan, so
+this free-tier config does *not* mount one — `data.sqlite` lives on the service's local
+filesystem. That data survives normal restarts and the free tier's inactivity spin-down/
+wake-up cycle, but resets on a new deploy (e.g. pushing a new commit). That's fine for
+demo/review purposes (documents persist across refresh and across idle periods — the
+requirement in scope) but not acceptable for real production use. Add a persistent disk
+(a paid Render plan, or an external DB like Turso/Postgres) if this ever needs to survive
+redeploys.
 
 ## Known limitations / what's incomplete
 

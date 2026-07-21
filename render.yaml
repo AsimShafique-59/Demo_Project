@@ -5,10 +5,3 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: npm start
-    disk:
-      name: docly-data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
-    envVars:
-      - key: DB_PATH
-        value: /opt/render/project/src/data/data.sqlite

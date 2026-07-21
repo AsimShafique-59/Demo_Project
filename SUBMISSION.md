@@ -16,7 +16,9 @@
   choice of vanilla JS/Express over Next.js/TypeScript)
 - `AI_WORKFLOW.md` — AI tool usage note
 - `package.json` — `npm install`, `npm start`, `npm test`
-- `render.yaml` — one-click Render deploy config (persistent disk mounted for `data.sqlite`)
+- `render.yaml` — one-click free Render Blueprint deploy config (no persistent disk — that
+  requires a paid Render plan; `data.sqlite` resets on redeploy but persists across
+  restarts/idle spin-down, which is fine for demo/review)
 
 ## Not included — requires action outside this coding session
 
@@ -25,9 +27,9 @@ here (a live deploy, a screen recording, uploading to Google Drive/YouTube/Loom)
 
 - **Live deployment URL** — not deployed yet. The app is a single Node process
   (`npm install && npm start`) with no required environment variables, so it deploys
-  as-is to Render, Railway, Fly.io, or similar in a few minutes. Recommend Render's free
-  web service tier: connect this repo, build command `npm install`, start command
-  `npm start`, and add a persistent disk mounted so `data.sqlite` survives restarts.
+  as-is to Render, Railway, Fly.io, or similar in a few minutes. `render.yaml` in this repo
+  is a ready-to-use free Blueprint deploy on Render (no persistent disk — see the note in
+  README.md about what that tradeoff means).
 - **Walkthrough video (3-5 min)** — not recorded. Suggested flow to record once deployed:
   log in as `alice` → create a doc → apply formatting → upload a `.txt` file → share the
   doc with `bob` → sign out → log in as `bob` → show it under "Shared with me" → refresh
@@ -55,11 +57,12 @@ then sign out and log in as `bob` to see it appear under "Shared with me".
 edit (bold/italic/underline/headings/bulleted+numbered lists), autosave, reopen after
 refresh, upload `.txt`/`.md` into a new document, share a document with another user,
 revoke a share, delete an owned document, visible owned-vs-shared distinction, search
-across documents, **version history with restore** (stretch feature), server-side access
+across documents, **version history with restore** and **Markdown export** (stretch
+features), server-side access
 control (verified by 10 automated tests), validation (empty title, weak password,
 duplicate username, unsupported upload type all rejected).
 
 **Incomplete / explicitly out of scope:** sessions/cookies (auth is header-based per
 request, no server-side session store), real-time co-editing, granular (viewer/editor)
-permissions, `.docx` import, version history, PDF/Markdown export. See ARCHITECTURE.md
+permissions, `.docx` import, PDF export, diff view between versions. See ARCHITECTURE.md
 for the reasoning and what's next.
