@@ -1,6 +1,5 @@
-Walkthrough video (unlisted Loom or YouTube link):
-
-TODO — paste your video URL here after recording.
+Walkthrough video:
+https://drive.google.com/file/d/1_Dl-n2-IzGbkEDYtNeNW5TGa3Od9gmTt/view?usp=sharing
 
 Suggested flow to record (3-5 min):
 1. Log in as alice / password123
