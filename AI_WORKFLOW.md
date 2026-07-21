@@ -6,6 +6,15 @@ Built entirely with **Claude Code** (Claude, Anthropic's agentic CLI) in a singl
 operating directly on the filesystem: writing files, running `npm install`, starting the
 server, and hitting live endpoints to verify behavior — not just generating code and hoping.
 
+## Stretch feature: version history
+
+Of the offered stretch options (real-time indicators, comments, version history, export,
+role-based permissions), version history was picked because it's self-contained — one new
+table, two new endpoints, one new modal — and doesn't touch existing routes or require new
+infrastructure (no WebSockets, no rendering pipeline), unlike real-time indicators or PDF
+export. It also composes naturally with the "restore" action being itself a save, so it
+reuses the exact same snapshot logic rather than needing a separate code path.
+
 ## Where AI materially sped up the work
 
 - **Scaffolding the whole stack in one pass**: schema, Express routes, auth middleware,
@@ -65,3 +74,11 @@ server, and hitting live endpoints to verify behavior — not just generating co
   what the code on disk actually said, not by guessing from the error text alone — and both
   are now called out in the README so a reviewer restarting the server doesn't hit the same
   trap.
+- **A classic falsy-zero bug, caught by the test suite, not by reading the code**: the
+  version-history snapshot throttle reads its interval from an env var for testability
+  (`VERSION_SNAPSHOT_INTERVAL_MS`), originally written as
+  `Number(process.env.VERSION_SNAPSHOT_INTERVAL_MS) || 60000`. Setting it to `'0'` in tests
+  (to disable throttling entirely) silently fell back to the 60-second default, because `0`
+  is falsy in JS — so a second edit within the same test run produced 1 version instead of
+  the expected 2. The test caught it immediately (`expected 2, actual 1`); the fix was an
+  explicit `!== undefined` check instead of `||`.

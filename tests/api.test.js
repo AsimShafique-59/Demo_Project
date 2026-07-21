@@ -6,6 +6,7 @@ const path = require('node:path');
 const testDbPath = path.join(__dirname, 'test.sqlite');
 if (fs.existsSync(testDbPath)) fs.unlinkSync(testDbPath);
 process.env.DB_PATH = testDbPath;
+process.env.VERSION_SNAPSHOT_INTERVAL_MS = '0'; // snapshot on every edit in tests, no throttling
 
 const request = require('supertest');
 const app = require('../server/app');
@@ -150,6 +151,59 @@ test('owner can revoke a share, and can delete their document', async () => {
 
   const aliceOpen = await request(app).get(`/api/documents/${docId}`).set('X-User-Id', alice);
   assert.strictEqual(aliceOpen.status, 403);
+});
+
+test('editing a document creates version history, and restoring brings back old content', async () => {
+  const alice = userId('alice');
+  const created = await request(app)
+    .post('/api/documents')
+    .set('X-User-Id', alice)
+    .send({ title: 'V1', content: '<p>first draft</p>' });
+  const docId = created.body.id;
+
+  const noVersionsYet = await request(app).get(`/api/documents/${docId}/versions`).set('X-User-Id', alice);
+  assert.strictEqual(noVersionsYet.body.length, 0);
+
+  await request(app)
+    .put(`/api/documents/${docId}`)
+    .set('X-User-Id', alice)
+    .send({ title: 'V2', content: '<p>second draft</p>' });
+
+  const afterFirstEdit = await request(app).get(`/api/documents/${docId}/versions`).set('X-User-Id', alice);
+  assert.strictEqual(afterFirstEdit.body.length, 1);
+  assert.strictEqual(afterFirstEdit.body[0].title, 'V1');
+
+  await request(app)
+    .put(`/api/documents/${docId}`)
+    .set('X-User-Id', alice)
+    .send({ title: 'V3', content: '<p>third draft</p>' });
+
+  const versions = await request(app).get(`/api/documents/${docId}/versions`).set('X-User-Id', alice);
+  assert.strictEqual(versions.body.length, 2);
+  const v1 = versions.body.find(v => v.title === 'V1');
+
+  const restore = await request(app)
+    .post(`/api/documents/${docId}/versions/${v1.id}/restore`)
+    .set('X-User-Id', alice);
+  assert.strictEqual(restore.status, 200);
+  assert.strictEqual(restore.body.title, 'V1');
+  assert.strictEqual(restore.body.content, '<p>first draft</p>');
+
+  // restoring itself snapshots the pre-restore state (V3), so history now has 3 entries
+  const versionsAfterRestore = await request(app).get(`/api/documents/${docId}/versions`).set('X-User-Id', alice);
+  assert.strictEqual(versionsAfterRestore.body.length, 3);
+});
+
+test('a non-owner without access cannot read or restore version history', async () => {
+  const alice = userId('alice');
+  const bob = userId('bob');
+  const created = await request(app)
+    .post('/api/documents')
+    .set('X-User-Id', alice)
+    .send({ title: 'Private', content: '<p>secret</p>' });
+
+  const res = await request(app).get(`/api/documents/${created.body.id}/versions`).set('X-User-Id', bob);
+  assert.strictEqual(res.status, 403);
 });
 
 test.after(() => {

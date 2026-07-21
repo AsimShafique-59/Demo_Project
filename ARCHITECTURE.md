@@ -35,10 +35,24 @@ save → reopen → share) over breadth of features. Concretely:
   inspectable, and the schema (users/documents/shares) would port to Postgres with almost no
   changes if scale demanded it later.
 
+- **Markdown export, as a second small addition.** Client-side only — walks the editor's
+  DOM and converts headings/bold/italic/underline/lists to Markdown, triggers a browser
+  download. No server round trip, no new dependency (a PDF export would have needed a
+  headless-browser dependency like Puppeteer, which was a worse risk/reward trade given
+  the sandbox instability already hit during this session — see AI_WORKFLOW.md).
+- **Version history as the primary stretch feature.** Every save that actually changes content
+  snapshots the previous state (throttled to at most once a minute, so autosave-on-every-
+  keystroke-pause doesn't flood the history table with near-duplicates), with a panel to
+  browse and restore. It's additive and self-contained — no existing route or table was
+  reshaped to fit it, it's one new table (`document_versions`) and two new endpoints.
+
 ## What I deliberately cut
 
-- **Real auth** (passwords, sessions, OAuth). Mocked user-switching demonstrates the same
-  access-control logic without spending the budget on auth plumbing.
+- **Full session infrastructure** (cookies, JWTs, server-side sessions). Auth is real —
+  username + password, scrypt-hashed, sign-up and login both enforced server-side — but
+  after login the client just holds `{id, username}` and sends it as `X-User-Id` on each
+  request rather than a signed session token. That's enough to demonstrate genuine
+  per-user access control without spending the budget on session plumbing a demo doesn't need.
 - **`.docx` import.** Parsing OOXML properly needs a real library and edge-case handling;
   `.txt`/`.md` demonstrates the same "file → document" product behavior for a fraction of
   the effort, and is clearly labeled as the supported set in the UI and README.
@@ -52,9 +66,10 @@ save → reopen → share) over breadth of features. Concretely:
 ## Data model
 
 ```
-users(id, username)
+users(id, username, password_hash)
 documents(id, title, content, owner_id, created_at, updated_at)
-shares(id, document_id, user_id)   -- one row per (document, grantee) pair
+shares(id, document_id, user_id)              -- one row per (document, grantee) pair
+document_versions(id, document_id, title, content, created_at)
 ```
 
 `content` stores the editor's HTML directly — simplest thing that preserves formatting
@@ -67,6 +82,9 @@ step in either direction.
    (e.g. via `updated_at` check) before overwriting on save, instead of pure last-write-wins.
 2. **Viewer vs. editor roles** on shares, enforced in the same `canAccess` check that
    already exists.
-3. **Document version history** — append-only snapshots on save, with a simple diff/restore UI.
+3. **A real diff view** in the version history panel (currently restore-only, no visual
+   diff between versions).
 4. **`.docx` import** via `mammoth` to convert to HTML on upload.
 5. **Export to PDF/Markdown** from the editor.
+6. **Sessions** (signed cookies or JWTs) in place of the `X-User-Id` header, if this ever
+   left demo scope.

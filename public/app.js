@@ -333,6 +333,7 @@ async function renderHistoryModal() {
         title: 'Restore this version?',
         body: 'The current content will be saved to history first, then replaced with this version.',
         confirmLabel: 'Restore',
+        danger: false,
       });
       if (!ok) return;
       try {
@@ -394,12 +395,64 @@ async function uploadFile(file) {
   }
 }
 
+// --- Export as Markdown ---
+function htmlToMarkdown(node) {
+  return Array.from(node.childNodes).map(nodeToMarkdown).join('').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function nodeToMarkdown(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+  if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+  const inner = () => Array.from(node.childNodes).map(nodeToMarkdown).join('');
+
+  switch (node.tagName) {
+    case 'H1': return `\n# ${inner().trim()}\n\n`;
+    case 'H2': return `\n## ${inner().trim()}\n\n`;
+    case 'H3': return `\n### ${inner().trim()}\n\n`;
+    case 'B': case 'STRONG': return `**${inner()}**`;
+    case 'I': case 'EM': return `*${inner()}*`;
+    case 'U': return `<u>${inner()}</u>`;
+    case 'BR': return '\n';
+    case 'P': case 'DIV': return `${inner()}\n\n`;
+    case 'UL':
+      return Array.from(node.children).map(li => `- ${nodeToMarkdown(li).trim()}\n`).join('') + '\n';
+    case 'OL':
+      return Array.from(node.children).map((li, i) => `${i + 1}. ${nodeToMarkdown(li).trim()}\n`).join('') + '\n';
+    case 'LI': return inner();
+    default: return inner();
+  }
+}
+
+function exportCurrentDocument() {
+  if (!state.currentDoc) return;
+  const container = document.createElement('div');
+  container.innerHTML = document.getElementById('editor').innerHTML;
+  const markdown = `# ${state.currentDoc.title}\n\n${htmlToMarkdown(container)}\n`;
+
+  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${state.currentDoc.title.replace(/[^a-z0-9-_ ]/gi, '').trim() || 'document'}.md`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('Exported as Markdown', 'success');
+}
+
 // --- Wire up ---
 document.getElementById('new-doc-btn').addEventListener('click', createDocument);
 document.getElementById('logout-btn').addEventListener('click', logout);
 document.getElementById('share-btn').addEventListener('click', openShareModal);
 document.getElementById('share-close-btn').addEventListener('click', () => {
   document.getElementById('share-modal').style.display = 'none';
+});
+document.getElementById('history-btn').addEventListener('click', openHistoryModal);
+document.getElementById('export-btn').addEventListener('click', exportCurrentDocument);
+document.getElementById('history-close-btn').addEventListener('click', () => {
+  document.getElementById('history-modal').style.display = 'none';
 });
 document.getElementById('title-input').addEventListener('input', scheduleSave);
 document.getElementById('editor').addEventListener('input', scheduleSave);

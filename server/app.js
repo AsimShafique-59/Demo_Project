@@ -104,7 +104,9 @@ app.get('/api/documents/:id', currentUser, (req, res) => {
   res.json({ ...access.doc, role: access.role, sharedWith: shares.map(s => s.username) });
 });
 
-const VERSION_SNAPSHOT_INTERVAL_MS = Number(process.env.VERSION_SNAPSHOT_INTERVAL_MS) || 60 * 1000;
+const VERSION_SNAPSHOT_INTERVAL_MS = process.env.VERSION_SNAPSHOT_INTERVAL_MS !== undefined
+  ? Number(process.env.VERSION_SNAPSHOT_INTERVAL_MS)
+  : 60 * 1000;
 
 // Snapshot the document's current (pre-update) state, throttled so autosave on every
 // keystroke pause doesn't flood the history with near-duplicate versions.

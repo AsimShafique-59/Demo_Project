@@ -69,7 +69,15 @@ covering auth, document creation, access control, sharing, and validation.
 4. **Share**: click "Share" on an open document, pick another user by username. That user
    will now see the document under "Shared with me" when they log in. The owner can revoke
    access or delete the document from the same menu.
-5. **Refresh the page** at any time — documents, formatting, and sharing all persist.
+5. **Version history** (stretch feature): click "History" on an open document to see past
+   snapshots and restore one. Snapshots are taken automatically as you edit, throttled to at
+   most once a minute so autosave doesn't flood the history with near-duplicates. Restoring
+   saves the current state to history first, so it's itself reversible.
+6. **Export**: click "Export" to download the open document as a `.md` file (headings,
+   bold/italic/underline, and lists are converted to Markdown client-side — no server round
+   trip, no new dependency).
+7. **Refresh the page** at any time — documents, formatting, sharing, and version history
+   all persist.
 
 Use "Log out" in the top bar and log back in as `bob` (same demo password) to see the
 sharing flow from the recipient's side.

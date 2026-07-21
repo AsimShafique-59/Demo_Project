@@ -246,6 +246,7 @@ body {
 .share-user-row button.revoke:hover { background: var(--danger-soft); border-color: #fecaca; }
 
 .confirm-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.confirm-actions .btn-primary, .confirm-actions .btn-danger { width: auto; }
 
 .version-list { display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
 .version-row {

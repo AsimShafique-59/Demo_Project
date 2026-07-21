@@ -3,12 +3,13 @@
 ## Included in this folder
 
 - `server/` — Express backend: password auth (sign-up/login), document CRUD, sharing
-  (grant/revoke), delete, file upload
+  (grant/revoke), delete, file upload, version history (snapshot + restore)
 - `public/` — frontend: login/sign-up screen, editor, sidebar with search, share modal,
-  confirm-delete dialog, toast notifications — vanilla HTML/CSS/JS
-- `tests/api.test.js` — automated API test suite (`npm test`), 8 passing tests covering
+  version history modal, Markdown export, confirm dialogs, toast notifications — vanilla
+  HTML/CSS/JS
+- `tests/api.test.js` — automated API test suite (`npm test`), 10 passing tests covering
   auth (sign-up/login/password verification), ownership, sharing/access control, revoke,
-  delete, and validation
+  delete, version history + restore, and validation
 - `README.md` — stack, local setup and run instructions, feature walkthrough, demo
   credentials, known limitations
 - `ARCHITECTURE.md` — what was prioritized, what was cut, and why (including the stack
@@ -54,8 +55,9 @@ then sign out and log in as `bob` to see it appear under "Shared with me".
 edit (bold/italic/underline/headings/bulleted+numbered lists), autosave, reopen after
 refresh, upload `.txt`/`.md` into a new document, share a document with another user,
 revoke a share, delete an owned document, visible owned-vs-shared distinction, search
-across documents, server-side access control (verified by 8 automated tests), validation
-(empty title, weak password, duplicate username, unsupported upload type all rejected).
+across documents, **version history with restore** (stretch feature), server-side access
+control (verified by 10 automated tests), validation (empty title, weak password,
+duplicate username, unsupported upload type all rejected).
 
 **Incomplete / explicitly out of scope:** sessions/cookies (auth is header-based per
 request, no server-side session store), real-time co-editing, granular (viewer/editor)
