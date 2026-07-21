@@ -1,0 +1,101 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #1f2328;
+  background: #f6f8fa;
+}
+
+.screen { min-height: 100vh; }
+
+/* Login */
+#login-screen { display: flex; align-items: center; justify-content: center; }
+.login-card {
+  background: #fff; padding: 40px; border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08); text-align: center; min-width: 320px;
+}
+.login-card h1 { margin: 0 0 8px; }
+.login-card p { color: #57606a; margin-bottom: 20px; }
+.user-list { display: flex; flex-direction: column; gap: 8px; }
+.user-list button {
+  padding: 10px 16px; border-radius: 8px; border: 1px solid #d0d7de;
+  background: #fff; cursor: pointer; font-size: 15px;
+}
+.user-list button:hover { background: #f3f4f6; }
+
+/* Topbar */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; background: #fff; border-bottom: 1px solid #d0d7de;
+}
+.brand { font-weight: 700; font-size: 18px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; color: #57606a; }
+
+/* Layout */
+.layout { display: flex; height: calc(100vh - 49px); }
+.sidebar {
+  width: 260px; background: #fff; border-right: 1px solid #d0d7de;
+  padding: 16px; overflow-y: auto; flex-shrink: 0;
+}
+.sidebar h3 { font-size: 12px; text-transform: uppercase; color: #57606a; margin: 20px 0 8px; }
+.doc-list { list-style: none; padding: 0; margin: 0; }
+.doc-list li {
+  padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 14px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.doc-list li:hover { background: #f3f4f6; }
+.doc-list li.active { background: #ddf4ff; font-weight: 600; }
+.doc-list li .owner-tag { display: block; font-size: 11px; color: #57606a; font-weight: 400; }
+
+.btn-primary {
+  width: 100%; padding: 10px; background: #1f883d; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
+}
+.btn-primary:hover { background: #1a7f37; }
+.btn-ghost {
+  padding: 8px 12px; background: #fff; border: 1px solid #d0d7de; border-radius: 8px;
+  cursor: pointer; font-size: 13px; display: inline-block; text-align: center;
+}
+.btn-ghost:hover { background: #f3f4f6; }
+.upload-label { width: 100%; margin-top: 8px; }
+
+/* Editor */
+.editor-pane, .empty-state { flex: 1; padding: 24px 40px; overflow-y: auto; }
+.empty-state { display: flex; align-items: center; justify-content: center; color: #57606a; }
+.editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.title-input {
+  font-size: 24px; font-weight: 700; border: none; outline: none; background: transparent;
+  width: 100%; padding: 4px;
+}
+.title-input:focus { background: #f6f8fa; border-radius: 6px; }
+.header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.save-status { font-size: 12px; color: #57606a; min-width: 90px; text-align: right; }
+
+.toolbar {
+  display: flex; gap: 6px; padding: 8px; background: #fff; border: 1px solid #d0d7de;
+  border-radius: 8px 8px 0 0; align-items: center;
+}
+.toolbar button, .toolbar select {
+  padding: 6px 10px; border: 1px solid transparent; border-radius: 6px; background: transparent;
+  cursor: pointer; font-size: 14px;
+}
+.toolbar button:hover, .toolbar select:hover { background: #f3f4f6; }
+.toolbar button.active { background: #ddf4ff; border-color: #54aeff; }
+
+.editor {
+  min-height: 60vh; background: #fff; border: 1px solid #d0d7de; border-top: none;
+  border-radius: 0 0 8px 8px; padding: 24px; font-size: 15px; line-height: 1.6; outline: none;
+}
+.editor h1 { font-size: 28px; margin: .4em 0; }
+.editor h2 { font-size: 22px; margin: .4em 0; }
+.editor h3 { font-size: 18px; margin: .4em 0; }
+.editor ul, .editor ol { padding-left: 24px; }
+
+/* Modal */
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-card { background: #fff; padding: 24px; border-radius: 12px; min-width: 320px; }
+.modal-card h3 { margin-top: 0; }
+.shared-with { margin-top: 16px; font-size: 13px; color: #57606a; }

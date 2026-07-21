@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Docly — collaborative docs</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="login-screen" class="screen">
+  <div class="login-card">
+    <h1>Docly</h1>
+    <p>Pick a seeded user to sign in (no password — this is a demo auth model).</p>
+    <div id="user-list" class="user-list"></div>
+  </div>
+</div>
+
+<div id="app-screen" class="screen" style="display:none">
+  <header class="topbar">
+    <div class="brand">Docly</div>
+    <div class="topbar-right">
+      <span id="whoami"></span>
+      <button id="logout-btn" class="btn-ghost">Switch user</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button id="new-doc-btn" class="btn-primary">+ New document</button>
+      <label class="upload-label btn-ghost">
+        Upload .txt/.md
+        <input id="upload-input" type="file" accept=".txt,.md" style="display:none" />
+      </label>
+
+      <h3>My documents</h3>
+      <ul id="owned-list" class="doc-list"></ul>
+
+      <h3>Shared with me</h3>
+      <ul id="shared-list" class="doc-list"></ul>
+    </aside>
+
+    <main class="editor-pane" id="editor-pane" style="display:none">
+      <div class="editor-header">
+        <input id="title-input" class="title-input" />
+        <div class="header-actions">
+          <span id="save-status" class="save-status"></span>
+          <button id="share-btn" class="btn-ghost">Share</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button data-cmd="bold" title="Bold"><b>B</b></button>
+        <button data-cmd="italic" title="Italic"><i>I</i></button>
+        <button data-cmd="underline" title="Underline"><u>U</u></button>
+        <select id="heading-select" title="Text style">
+          <option value="p">Normal</option>
+          <option value="h1">Heading 1</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+        </select>
+        <button data-cmd="insertUnorderedList" title="Bulleted list">&#8226; List</button>
+        <button data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+      </div>
+
+      <div id="editor" class="editor" contenteditable="true"></div>
+    </main>
+
+    <main class="empty-state" id="empty-state">
+      <p>Select a document, create a new one, or upload a file to get started.</p>
+    </main>
+  </div>
+</div>
+
+<div id="share-modal" class="modal" style="display:none">
+  <div class="modal-card">
+    <h3>Share document</h3>
+    <p>Grant another seeded user access.</p>
+    <div id="share-user-options" class="user-list"></div>
+    <div id="share-current" class="shared-with"></div>
+    <button id="share-close-btn" class="btn-ghost">Close</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
