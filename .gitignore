@@ -20,3 +20,5 @@ Thumbs.db
 uploads/
 *.tmp
 *.temp
+data.sqlite
+tests/test.sqlite

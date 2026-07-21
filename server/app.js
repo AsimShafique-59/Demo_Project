@@ -37,6 +37,20 @@ app.get('/api/users', (req, res) => {
   res.json(db.prepare('SELECT id, username FROM users').all());
 });
 
+// dynamic "sign up": create a user on the fly, or sign in if the username already exists
+app.post('/api/users', (req, res) => {
+  const username = (req.body.username || '').trim().toLowerCase();
+  if (!username) return res.status(400).json({ error: 'Username is required' });
+  if (!/^[a-z0-9_-]{2,20}$/.test(username)) {
+    return res.status(400).json({ error: 'Username must be 2-20 characters: letters, numbers, - or _' });
+  }
+  const existing = db.prepare('SELECT id, username FROM users WHERE username = ?').get(username);
+  if (existing) return res.json(existing);
+
+  const result = db.prepare('INSERT INTO users (username) VALUES (?)').run(username);
+  res.status(201).json({ id: result.lastInsertRowid, username });
+});
+
 app.get('/api/me', currentUser, (req, res) => res.json(req.user));
 
 // list documents visible to the current user, tagged owned/shared
@@ -102,6 +116,29 @@ app.post('/api/documents/:id/share', currentUser, (req, res) => {
 
   db.prepare('INSERT OR IGNORE INTO shares (document_id, user_id) VALUES (?, ?)').run(access.doc.id, target.id);
   res.status(201).json({ ok: true, sharedWith: target.username });
+});
+
+app.delete('/api/documents/:id/share', currentUser, (req, res) => {
+  const access = canAccess(Number(req.params.id), req.user.id);
+  if (!access) return res.status(403).json({ error: 'No access to this document' });
+  if (access.role !== 'owner') return res.status(403).json({ error: 'Only the owner can modify sharing' });
+
+  const username = (req.body.username || '').trim();
+  const target = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  if (!target) return res.status(404).json({ error: `No user named "${username}"` });
+
+  db.prepare('DELETE FROM shares WHERE document_id = ? AND user_id = ?').run(access.doc.id, target.id);
+  res.json({ ok: true, removed: target.username });
+});
+
+app.delete('/api/documents/:id', currentUser, (req, res) => {
+  const access = canAccess(Number(req.params.id), req.user.id);
+  if (!access) return res.status(403).json({ error: 'No access to this document' });
+  if (access.role !== 'owner') return res.status(403).json({ error: 'Only the owner can delete this document' });
+
+  db.prepare('DELETE FROM shares WHERE document_id = ?').run(access.doc.id);
+  db.prepare('DELETE FROM documents WHERE id = ?').run(access.doc.id);
+  res.status(204).end();
 });
 
 // Upload a .txt/.md file and turn it into a new editable document
