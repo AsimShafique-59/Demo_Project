@@ -104,6 +104,22 @@ app.get('/api/documents/:id', currentUser, (req, res) => {
   res.json({ ...access.doc, role: access.role, sharedWith: shares.map(s => s.username) });
 });
 
+const VERSION_SNAPSHOT_INTERVAL_MS = Number(process.env.VERSION_SNAPSHOT_INTERVAL_MS) || 60 * 1000;
+
+// Snapshot the document's current (pre-update) state, throttled so autosave on every
+// keystroke pause doesn't flood the history with near-duplicate versions.
+function maybeSnapshotVersion(doc) {
+  const last = db.prepare(
+    `SELECT created_at FROM document_versions WHERE document_id = ? ORDER BY id DESC LIMIT 1`
+  ).get(doc.id);
+  const lastTime = last ? new Date(last.created_at.replace(' ', 'T') + 'Z').getTime() : 0;
+  if (Date.now() - lastTime < VERSION_SNAPSHOT_INTERVAL_MS) return;
+
+  db.prepare(
+    'INSERT INTO document_versions (document_id, title, content) VALUES (?, ?, ?)'
+  ).run(doc.id, doc.title, doc.content);
+}
+
 app.put('/api/documents/:id', currentUser, (req, res) => {
   const access = canAccess(Number(req.params.id), req.user.id);
   if (!access) return res.status(403).json({ error: 'No access to this document' });
@@ -112,9 +128,42 @@ app.put('/api/documents/:id', currentUser, (req, res) => {
   const content = req.body.content !== undefined ? req.body.content : access.doc.content;
   if (!title) return res.status(400).json({ error: 'Title cannot be empty' });
 
+  if (title !== access.doc.title || content !== access.doc.content) {
+    maybeSnapshotVersion(access.doc);
+  }
+
   db.prepare(
     `UPDATE documents SET title = ?, content = ?, updated_at = datetime('now') WHERE id = ?`
   ).run(title, content, access.doc.id);
+
+  res.json(db.prepare('SELECT * FROM documents WHERE id = ?').get(access.doc.id));
+});
+
+app.get('/api/documents/:id/versions', currentUser, (req, res) => {
+  const access = canAccess(Number(req.params.id), req.user.id);
+  if (!access) return res.status(403).json({ error: 'No access to this document' });
+
+  const versions = db.prepare(
+    `SELECT id, title, created_at FROM document_versions WHERE document_id = ? ORDER BY id DESC`
+  ).all(access.doc.id);
+  res.json(versions);
+});
+
+app.post('/api/documents/:id/versions/:versionId/restore', currentUser, (req, res) => {
+  const access = canAccess(Number(req.params.id), req.user.id);
+  if (!access) return res.status(403).json({ error: 'No access to this document' });
+
+  const version = db.prepare(
+    'SELECT * FROM document_versions WHERE id = ? AND document_id = ?'
+  ).get(Number(req.params.versionId), access.doc.id);
+  if (!version) return res.status(404).json({ error: 'Version not found' });
+
+  // Snapshot the current state too, so restoring is itself reversible.
+  maybeSnapshotVersion(access.doc);
+
+  db.prepare(
+    `UPDATE documents SET title = ?, content = ?, updated_at = datetime('now') WHERE id = ?`
+  ).run(version.title, version.content, access.doc.id);
 
   res.json(db.prepare('SELECT * FROM documents WHERE id = ?').get(access.doc.id));
 });
@@ -152,6 +201,7 @@ app.delete('/api/documents/:id', currentUser, (req, res) => {
   if (access.role !== 'owner') return res.status(403).json({ error: 'Only the owner can delete this document' });
 
   db.prepare('DELETE FROM shares WHERE document_id = ?').run(access.doc.id);
+  db.prepare('DELETE FROM document_versions WHERE document_id = ?').run(access.doc.id);
   db.prepare('DELETE FROM documents WHERE id = ?').run(access.doc.id);
   res.status(204).end();
 });

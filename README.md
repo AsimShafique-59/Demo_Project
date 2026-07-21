@@ -85,7 +85,12 @@ cut for scope — see [ARCHITECTURE.md](ARCHITECTURE.md).
 Ships as a single Node process serving both the API and static frontend, so it deploys
 as-is to any Node host (Render, Railway, Fly.io, a VPS, etc.) with `npm install && npm start`.
 No environment variables are required for local/demo use. `data.sqlite` should live on
-persistent storage (a mounted volume) if deployed somewhere with an ephemeral filesystem.
+persistent storage (a mounted volume) if deployed somewhere with an ephemeral filesystem —
+set `DB_PATH` to point at that mounted path (defaults to `./data.sqlite` otherwise).
+
+A `render.yaml` is included for a one-click deploy on [Render](https://render.com): it
+provisions a free web service with a persistent disk mounted for the database, wired via
+`DB_PATH`. Connect this repo in the Render dashboard and it picks up the config automatically.
 
 ## Known limitations / what's incomplete
 

@@ -295,14 +295,70 @@ async function renderShareModal() {
   });
 }
 
+// --- Version history modal ---
+async function openHistoryModal() {
+  if (!state.currentDoc) return;
+  document.getElementById('history-modal').style.display = 'flex';
+  await renderHistoryModal();
+}
+
+async function renderHistoryModal() {
+  const versions = await api(`/api/documents/${state.currentDoc.id}/versions`);
+  const container = document.getElementById('version-list');
+
+  const currentRow = `
+    <div class="version-row">
+      <div class="version-info">
+        <div class="version-title">${escapeHtml(state.currentDoc.title)}</div>
+        <div class="version-time"><span class="version-current">Current</span> · ${relativeTime(state.currentDoc.updated_at)}</div>
+      </div>
+    </div>`;
+
+  const historyRows = versions.map(v => `
+    <div class="version-row" data-version-id="${v.id}">
+      <div class="version-info">
+        <div class="version-title">${escapeHtml(v.title)}</div>
+        <div class="version-time">${relativeTime(v.created_at)}</div>
+      </div>
+      <button data-action="restore">Restore</button>
+    </div>`).join('');
+
+  container.innerHTML = currentRow + (historyRows || '<p class="version-empty">No earlier versions yet — snapshots appear as you keep editing.</p>');
+
+  container.querySelectorAll('button[data-action="restore"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.version-row');
+      const versionId = row.dataset.versionId;
+      const ok = await confirmDialog({
+        title: 'Restore this version?',
+        body: 'The current content will be saved to history first, then replaced with this version.',
+        confirmLabel: 'Restore',
+      });
+      if (!ok) return;
+      try {
+        const updated = await api(`/api/documents/${state.currentDoc.id}/versions/${versionId}/restore`, { method: 'POST' });
+        state.currentDoc = { ...state.currentDoc, ...updated };
+        document.getElementById('title-input').value = updated.title;
+        document.getElementById('editor').innerHTML = updated.content || '';
+        toast('Version restored', 'success');
+        document.getElementById('history-modal').style.display = 'none';
+        refreshDocList();
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    });
+  });
+}
+
 // --- Confirm modal (generic) ---
-function confirmDialog({ title, body, confirmLabel = 'Confirm' }) {
+function confirmDialog({ title, body, confirmLabel = 'Confirm', danger = true }) {
   return new Promise(resolve => {
     const modal = document.getElementById('confirm-modal');
     document.getElementById('confirm-title').textContent = title;
     document.getElementById('confirm-body').textContent = body;
     const okBtn = document.getElementById('confirm-ok-btn');
     okBtn.textContent = confirmLabel;
+    okBtn.className = danger ? 'btn-danger' : 'btn-primary';
     modal.style.display = 'flex';
 
     function cleanup(result) {

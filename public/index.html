@@ -75,6 +75,10 @@
         <input id="title-input" class="title-input" spellcheck="false" />
         <div class="header-actions">
           <span id="save-status" class="save-status"></span>
+          <button id="history-btn" class="btn-ghost" title="Version history">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3 4v5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            History
+          </button>
           <button id="share-btn" class="btn-ghost">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2" stroke="currentColor" stroke-width="1.6"/></svg>
             Share
@@ -126,8 +130,21 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </div>
-    <p class="modal-sub">Grant another seeded user access to this document.</p>
+    <p class="modal-sub">Grant another user access to this document.</p>
     <div id="share-user-options" class="share-user-list"></div>
+  </div>
+</div>
+
+<div id="history-modal" class="modal" style="display:none">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Version history</h3>
+      <button id="history-close-btn" class="btn-icon" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <p class="modal-sub">Snapshots are saved periodically as you edit. Restoring keeps the current version in history too.</p>
+    <div id="version-list" class="version-list"></div>
   </div>
 </div>
 

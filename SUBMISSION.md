@@ -15,6 +15,7 @@
   choice of vanilla JS/Express over Next.js/TypeScript)
 - `AI_WORKFLOW.md` — AI tool usage note
 - `package.json` — `npm install`, `npm start`, `npm test`
+- `render.yaml` — one-click Render deploy config (persistent disk mounted for `data.sqlite`)
 
 ## Not included — requires action outside this coding session
 

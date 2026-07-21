@@ -30,6 +30,15 @@ db.exec(`
     FOREIGN KEY (document_id) REFERENCES documents(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
+
+  CREATE TABLE IF NOT EXISTS document_versions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (document_id) REFERENCES documents(id)
+  );
 `);
 
 // Seeded demo accounts, all sharing the same demo password (see README for credentials).
