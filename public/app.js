@@ -500,9 +500,24 @@ document.getElementById('share-close-btn').addEventListener('click', () => {
   document.getElementById('share-modal').style.display = 'none';
 });
 document.getElementById('history-btn').addEventListener('click', openHistoryModal);
-document.getElementById('export-btn').addEventListener('click', exportCurrentDocument);
 document.getElementById('history-close-btn').addEventListener('click', () => {
   document.getElementById('history-modal').style.display = 'none';
+});
+
+document.getElementById('export-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  openExportMenu();
+});
+document.getElementById('export-menu').addEventListener('click', (e) => {
+  const format = e.target.closest('button')?.dataset.format;
+  if (!format) return;
+  closeExportMenu();
+  if (format === 'md') exportAsMarkdown();
+  else if (format === 'txt') exportAsText();
+  else if (format === 'pdf') exportAsPDF();
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.export-menu-wrapper')) closeExportMenu();
 });
 document.getElementById('title-input').addEventListener('input', scheduleSave);
 document.getElementById('editor').addEventListener('input', scheduleSave);
